@@ -1,6 +1,5 @@
 import stl
 import numpy as np
-import math
 from scipy.spatial import KDTree
 
 sphere = stl.Mesh.from_file("sphere.stl")
