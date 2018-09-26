@@ -1,4 +1,6 @@
 # mesh_interpolator
+
+REQUIREMENTS: numpy, numpy-stl, scipy
 An algorithm that will interpolate between two given stl files.
 
 Rename the 'sphere.stl' and 'ellipse.stl' in the code to the meshes you wish to use.
