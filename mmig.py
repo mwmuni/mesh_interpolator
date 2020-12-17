@@ -4,7 +4,7 @@ from scipy.spatial import KDTree
 import sys
 
 if len(sys.argv) > 1:
-    _INTERPOLATION = sys.argv[1]
+    _INTERPOLATION = float(sys.argv[1])
     _sphere = sys.argv[2]
     _ellipse = sys.argv[3]
 else:
