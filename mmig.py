@@ -54,8 +54,8 @@ if __name__ == '__main__':
         _ellipse = "ellipse.stl"
         _INTERPOLATION = 0.5
 
-    _start = time()
     print('loading meshes')
+    _start = time()
     with Pool(2) as pool:
         threads = [pool.apply_async(stl.Mesh.from_file, (_sphere,)),
         pool.apply_async(stl.Mesh.from_file, (_ellipse,))]
@@ -73,8 +73,8 @@ if __name__ == '__main__':
 
     verts = [i_v0, i_v1, i_v2]
 
-    _start = time()
     print('hashing meshes')
+    _start = time()
     with Pool(2) as pool:
         threads = [pool.apply_async(hash_mesh, (sphere, verts, sphere_hash)),
             pool.apply_async(hash_mesh, (ellipse, verts, ellipse_hash))]
@@ -84,8 +84,8 @@ if __name__ == '__main__':
 
     kdtree = KDTree(ellipse_points, leafsize=90)
 
-    _start = time()
     print('about to query')
+    _start = time()
     with Pool(cpu_count()) as p:
         locations = p.map(functools.partial(process_kdtree_chunk, kdtree=kdtree), sphere_points, len(sphere_points)//cpu_count())
     _end = time()

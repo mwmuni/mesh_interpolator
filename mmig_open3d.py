@@ -26,8 +26,8 @@ if __name__ == '__main__':
         _ellipse = "ellipse.stl"
         _INTERPOLATION = 0.5
 
-    _start = time()
     print('loading meshes')
+    _start = time()
     sphere = o3d.io.read_triangle_mesh(_sphere)
     ellipse = o3d.io.read_triangle_mesh(_ellipse)
 
@@ -48,8 +48,8 @@ if __name__ == '__main__':
 
     kdtree = KDTree(ellipse_points, leafsize=90)
 
-    _start = time()
     print('about to query')
+    _start = time()
     with Pool(cpu_count()) as p:
         locations = p.map(functools.partial(process_kdtree_chunk, kdtree=kdtree), sphere_points, sphere_points.shape[0]//cpu_count())
     _end = time()
@@ -57,8 +57,8 @@ if __name__ == '__main__':
 
     locations = [l[1] for l in locations]
 
-    _start = time()
     print('about to interpolate')
+    _start = time()
     inter = np.array(np.apply_along_axis(interpolate, 1, np.array([(s_p[1], ellipse_points[locations[s_p[0][0]]][s_p[0][1]]) for s_p in np.ndenumerate(sphere_points)], dtype=object)))
     sphere_points[:] = inter[:, 0].reshape((-1,3))
     _end = time()
