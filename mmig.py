@@ -54,12 +54,14 @@ if __name__ == '__main__':
         _ellipse = "ellipse.stl"
         _INTERPOLATION = 0.5
 
+    _start = time()
     print('loading meshes')
     with Pool(2) as pool:
         threads = [pool.apply_async(stl.Mesh.from_file, (_sphere,)),
         pool.apply_async(stl.Mesh.from_file, (_ellipse,))]
         sphere, ellipse = [p.get() for p in threads]
-    print('finished loading meshes')
+    _end = time()
+    print(f'finished loading meshes in {_end - _start}')
 
     INTERPOLATION = _INTERPOLATION
 
@@ -71,22 +73,27 @@ if __name__ == '__main__':
 
     verts = [i_v0, i_v1, i_v2]
 
+    _start = time()
     print('hashing meshes')
     with Pool(2) as pool:
         threads = [pool.apply_async(hash_mesh, (sphere, verts, sphere_hash)),
             pool.apply_async(hash_mesh, (ellipse, verts, ellipse_hash))]
         sphere_points, ellipse_points = [p.get() for p in threads]
-    print('finished hashing meshes')
+    _end = time()
+    print(f'finished hashing meshes in {_end - _start}')
 
     kdtree = KDTree(ellipse_points, leafsize=90)
 
+    _start = time()
     print('about to query')
     with Pool(cpu_count()) as p:
         locations = p.map(functools.partial(process_kdtree_chunk, kdtree=kdtree), sphere_points, len(sphere_points)//cpu_count())
-    print('finised query')
+    _end = time()
+    print(f'finised query in {_end - _start}')
 
     locations = [l[1] for l in locations]
 
+    _start = time()
     for v in range(len(locations)):
         v1 = sphere_points[v]
         v2 = ellipse_points[locations[v]]
@@ -94,7 +101,10 @@ if __name__ == '__main__':
                             (1 - INTERPOLATION)*v1[1] + INTERPOLATION*v2[1],
                             (1 - INTERPOLATION)*v1[2] + INTERPOLATION*v2[2]])
         sphere_hash[hash(v1.tobytes())] = new_loc
+    _end = time()
+    print(f'finished interpolation in {_end - _start}')
 
+    _start = time()
     for f in sphere:
         v0_h = sphere_hash[hash(f[i_v0].tobytes())]
         v1_h = sphere_hash[hash(f[i_v1].tobytes())]
@@ -104,6 +114,8 @@ if __name__ == '__main__':
             f[i_v0[i]] = v0_h[i]
             f[i_v1[i]] = v1_h[i]
             f[i_v2[i]] = v2_h[i]
+    _end = time()
+    print(f'finished hash update in {_end-_start}')
 
     sphere.save('interpolated.stl')
     end = time()
