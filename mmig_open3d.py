@@ -65,7 +65,7 @@ if __name__ == '__main__':
     print(f'finised interpolating in {_end - _start}')
 
     sphere.compute_triangle_normals()
-    o3d.io.write_triangle_mesh("interpolated.stl", sphere)
+    o3d.io.write_triangle_mesh("interpolated."+_sphere.split('.')[-1], sphere)
 
     end = time()
     print(f'time taken was: {end-start}')
