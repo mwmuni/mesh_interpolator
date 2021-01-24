@@ -1,4 +1,3 @@
-import stl
 import numpy as np
 from scipy.spatial import cKDTree as KDTree
 import open3d as o3d
