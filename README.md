@@ -3,7 +3,7 @@
 REQUIREMENTS: numpy, numpy-stl, scipy
 OPTIONAL: Open3D
 
-An algorithm that will interpolate between two given stl files.
+An algorithm that will interpolate between two given mesh files.
 
 Rename the 'sphere.stl' and 'ellipse.stl' in the code to the meshes you wish to use. Change the value of 'INTERPOLATION' to choose how far the mesh will be interpolated. (between 0 and 1)
 Or simply run it with the arguments:
