@@ -22,7 +22,7 @@ if __name__ == '__main__':
     _start = time()
     sphere = o3d.io.read_triangle_mesh(_sphere)
     ellipse = o3d.io.read_triangle_mesh(_ellipse)
-
+    
     sphere.remove_duplicated_triangles()
     sphere.remove_duplicated_vertices()
     sphere.remove_degenerate_triangles()
@@ -50,11 +50,7 @@ if __name__ == '__main__':
 
     print('about to interpolate')
     _start = time()
-    # lam = lambda x: (1 - INTERPOLATION)*x[0] + INTERPOLATION*x[1]
-    # lam = lambda x: x[0]+(-(x[0]-x[1])*INTERPOLATION)
-    # inter = np.array(np.apply_along_axis(lam, 1, np.array([(s_p[1], ellipse_points[locations[s_p[0][0]]][s_p[0][1]]) for s_p in np.ndenumerate(sphere_points)], dtype=object)))
-    # inter = np.array(np.apply_along_axis(lam, 1, np.array([(s_p[1], ellipse_points[locations[s_p[0][0]]][s_p[0][1]]) for s_p in np.ndenumerate(sphere_points)], dtype=object)))
-    # sphere_points[:] = inter.reshape((-1,3))
+    
     # For some reason, using lambda increases processing time by 0.7s, so I'll stick with partial
     inter = np.array(np.apply_along_axis(functools.partial(mmig.interpolate, interpolation=INTERPOLATION), 1, np.array([(s_p[1], ellipse_points[locations[s_p[0][0]]][s_p[0][1]]) for s_p in np.ndenumerate(sphere_points)], dtype=object)))
     sphere_points[:] = inter[:, 0].reshape((-1,3))

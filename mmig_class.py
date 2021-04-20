@@ -21,3 +21,12 @@ class mmig:
         s_p[0] = (1 - interpolation)*s_p[0] + interpolation*s_p[1]
         # s_p[0] = s_p[0]+(-(s_p[0]-s_p[1])*interpolation)
         return s_p
+    
+    @staticmethod
+    def interpolate_xy(s_p: Tuple[float, float], interpolation: float) -> Tuple[float, float]:
+        """Moves s_p[0] towards s_p[1] by a factor of INTERPOLATION leaving the z axis for s_p[0] unchanged
+        
+        Used for np.apply_along_axis, this function gets applied vertically along the input array"""
+        s_p[0] = np.array([*((1 - interpolation)*s_p[0, :2] + interpolation*s_p[1]), s_p[0, 2]])
+        # s_p[0] = s_p[0]+(-(s_p[0]-s_p[1])*interpolation)
+        return s_p
