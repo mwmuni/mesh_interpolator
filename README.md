@@ -13,3 +13,7 @@ Example:
 python mmig.py 0.5 sphere.stl ellipse.stl
 
 The mmig_open3d.py version leverages Open3D to speed up the interpolation drastically (around 5x speedup). The Open3D version is strongly recommended over the numpy-stl version not only for speed, but for the ability to use file types other than STL.
+
+SUPPORTED FILE TYPES (mmig_open3d.py only): STL, PLY, OFF, OBJ, GLTF
+
+Only STL seems to store the vertex/triangle normals, so it may be best to stick to STL files.
