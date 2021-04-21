@@ -67,14 +67,14 @@ if __name__ == '__main__':
     print('Interpolating wear')
     _start = time()
 
-    wear_total = np.array([0.0 for _ in range(sphere_points.shape[0])])
+    wear_total = {n: {'wear': 0.0, 'tally': 0} for n in range(sphere_points.shape[0])}
     max_vertex = np.array([args.radius, args.radius])
     max_scalar = 0
     np_wear = np.array(wear)
     avg_pnt = lambda p: np.mean((sphere_points[p[0]], sphere_points[p[1]], sphere_points[p[2]]), axis=0)
     avg_pnt_sphere = np.array(np.apply_along_axis(avg_pnt, 1, sphere_triangles))
     sphere_tree = KDTree(avg_pnt_sphere)
-    query_result = sphere_tree.query_ball_point(avg_pnt_sphere, 0.1)
+    query_result = sphere_tree.query_ball_point(avg_pnt_sphere, 0.15)
     smooth_fn = lambda near: np.mean([np_wear[idx] for idx in near])
     smooth_wear = np.apply_along_axis(np.vectorize(smooth_fn), 0, query_result)
     np_wear = smooth_wear
@@ -82,8 +82,17 @@ if __name__ == '__main__':
     for i, w in enumerate(np_wear):
         tri = sphere_triangles[i]
         for v in tri:
-            max_scalar = max(max_scalar, wear_total[v]+w)
-            wear_total[v] += w
+            wear_total[v]['wear'] += w
+            wear_total[v]['tally'] += 1
+    
+    for key in wear_total:
+        wear_total[key]['wear'] /= wear_total[key]['tally']
+        max_scalar = max(max_scalar, wear_total[key]['wear'])
+
+    for key in wear_total:
+        wear_total[key]['wear'] /= max_scalar
+    
+    wear_total = np.array([wear_total[key]['wear'] for key in range(len(wear_total))])
 
     # @numba.njit('float64[:], float64', fastmath=True)
     def interpolate(s_p: np.ndarray, _wear: float):
@@ -100,13 +109,12 @@ if __name__ == '__main__':
         s_p[...] = (1 - scale)*s_p + scale*zsame_xymax
 
     # @numba.njit('float64[:,:], float64[:], float64', parallel=True, fastmath=True)
-    def run_interpolation(_sphere_points, _wear_total, _max_scalar):
+    def run_interpolation(_sphere_points, _wear_total):
         for i in range(len(_wear_total)):
-            _wear_total[i] /= _max_scalar
             interpolate(_sphere_points[i], _wear_total[i])
 
     # print(numba.typeof(sphere_points), numba.typeof(wear_total), numba.typeof(max_scalar))
-    run_interpolation(sphere_points, wear_total, max_scalar)
+    run_interpolation(sphere_points, wear_total)
 
     _end = time()
     print(f'Finished interpolating wear in {_end - _start}')
